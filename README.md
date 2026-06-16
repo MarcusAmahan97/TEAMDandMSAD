@@ -1,4 +1,4 @@
-# TEAM D&M SAD
+# TEAM D&M - Systems Analysis and Design
 **Kuya Weng's Digital Kitchen Order Monitoring and Coordination System**  
 by Dwayne Matthew Francisco & Josh Marcus Amahan
 
