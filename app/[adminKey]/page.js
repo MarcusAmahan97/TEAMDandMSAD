@@ -92,8 +92,12 @@ export default function StaffPortalRoute({ params: paramsPromise }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-900/95 px-6 font-sans">
         <div className="max-w-md w-full bg-stone-800 rounded-[2.5rem] p-12 shadow-2xl border border-stone-700 text-center">
-          <div className="w-16 h-16 bg-stone-950 text-yellow-400 rounded-2xl flex items-center justify-center font-black text-xl mx-auto mb-6 shadow-md">
-            KW
+          <div className="w-48 h-48 mx-auto mb-6 flex items-center justify-center overflow-hidden">
+            <img 
+              src="/images/logo.png"
+              alt="Kuya Weng's Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-2xl font-black text-white mb-2 tracking-tight">{currentConfig?.title}</h1>
           <p className="text-stone-400 text-xs mb-8 uppercase tracking-widest font-bold">{currentConfig?.subtitle}</p>

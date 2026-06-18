@@ -107,7 +107,7 @@ function KitchenDashboard() {
           >
             <div className="flex justify-between items-start mb-2">
               <div>
-                <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Ticket</span>
+                <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Order</span>
                 <h3 className="text-3xl font-black font-mono text-white">#{order.order_number}</h3>
               </div>
               <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider ${
@@ -147,11 +147,11 @@ function KitchenDashboard() {
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-gray-800 border border-gray-700 rounded-[2.5rem] max-w-md w-full p-8 text-white relative">
-            <h3 className="text-2xl font-black mb-1 font-mono text-yellow-400">Order Ticket #{selectedOrder.order_number}</h3>
+            <h3 className="text-2xl font-black mb-1 font-mono text-yellow-400">Order #{selectedOrder.order_number}</h3>
             <p className="text-xs text-gray-400 uppercase tracking-widest mb-4">Status: {selectedOrder.status}</p>
             
             <div className="bg-gray-900 p-5 rounded-2xl border border-gray-700/60 mb-6">
-              <h4 className="text-xs text-gray-400 font-bold uppercase mb-2 tracking-wider">Kitchen Ticket Contents</h4>
+              <h4 className="text-xs text-gray-400 font-bold uppercase mb-2 tracking-wider">Kitchen Order Contents</h4>
               <div className="text-sm leading-relaxed">{renderBulletItems(selectedOrder.items_summary)}</div>
             </div>
 

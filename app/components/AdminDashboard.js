@@ -4,6 +4,7 @@ import { supabase } from '@/app/lib/supabase.js';
 import MenuManagement from './MenuManagement';
 import CalculationTable from './CalculationTable'; 
 import OrdersQueueTable from './OrdersQueueTable'; 
+import OrderHistoryModal from './OrderHistoryModal';
 
 export default function AdminDashboard() {
   const [menuItems, setMenuItems] = useState([]);
@@ -19,6 +20,8 @@ export default function AdminDashboard() {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+
+  const [currentView, setCurrentView] = useState('dashboard');
 
   async function fetchFoodItems() {
     const { data, error } = await supabase.from('food_items').select('*').order('name', { ascending: true });
@@ -102,7 +105,7 @@ export default function AdminDashboard() {
     );
 
     if (isTicketInUse) {
-      setTicketError(`Ticket Number #${cleanedTicketNum} is currently active in the kitchen workspace.`);
+      setTicketError(`Order Number #${cleanedTicketNum} is currently active in the kitchen workspace.`);
       return;
     }
 
@@ -127,24 +130,57 @@ export default function AdminDashboard() {
     }
   };
 
-  return (
-    <div className="p-6 max-w-7xl mx-auto font-sans bg-stone-50 min-h-screen text-gray-800">
+return (
+    <div className="p-6 max-w-7xl mx-auto font-sans bg-stone-50 min-h-screen text-gray-800 pb-24">
+      {/* Header */}
       <div className="flex justify-between items-center mb-8 border-b pb-4 border-stone-200">
         <h1 className="text-3xl font-black text-[#1a2e1a] tracking-tight">Kuya Weng's Staff Portal</h1>
         <span className="bg-[#1a2e1a] text-yellow-400 text-xs font-bold px-3 py-1 rounded-full uppercase">Secure POS Session</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <MenuManagement 
-          menuItems={menuItems} name={name} setName={setName} price={price} setPrice={setPrice} imageUrl={imageUrl} setImageUrl={setImageUrl}
-          handleAddPrompt={(e) => { e.preventDefault(); setShowAddModal(true); }} toggleAvailability={toggleAvailability} addToCart={addToCart}
-        />
-        <CalculationTable cart={cart} menuItems={menuItems} removeFromCart={removeFromCart} subtotal={subtotal} setShowOrderModal={handleOrderSubmissionClick} />
+      {/* Main View Switcher */}
+      {currentView === 'dashboard' ? (
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <MenuManagement 
+              menuItems={menuItems} name={name} setName={setName} price={price} setPrice={setPrice} 
+              imageUrl={imageUrl} setImageUrl={setImageUrl}
+              handleAddPrompt={(e) => { e.preventDefault(); setShowAddModal(true); }} 
+              toggleAvailability={toggleAvailability} addToCart={addToCart}
+            />
+            <CalculationTable 
+              cart={cart} menuItems={menuItems} removeFromCart={removeFromCart} 
+              subtotal={subtotal} setShowOrderModal={handleOrderSubmissionClick} 
+            />
+          </div>
+          <OrdersQueueTable activeOrders={activeOrders} updateOrderStatus={updateOrderStatus} />
+        </div>
+      ) : (
+        <div className="min-h-[500px]">
+          <OrderHistoryModal onClose={() => setCurrentView('dashboard')} />
+        </div>
+      )}
+
+      {/* Footer Navigation Switch */}
+      <div className="fixed bottom-8 left-0 right-0 flex justify-center z-40">
+        <div className="bg-white border border-stone-200 shadow-xl rounded-full p-1 flex items-center gap-1">
+          <button 
+            onClick={() => setCurrentView('dashboard')}
+            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${currentView === 'dashboard' ? 'bg-[#1a2e1a] text-white' : 'text-stone-500 hover:bg-stone-100'}`}
+          >
+            Add Order
+          </button>
+          <span className="text-stone-300 font-light">|</span>
+          <button 
+            onClick={() => setCurrentView('history')}
+            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${currentView === 'history' ? 'bg-[#1a2e1a] text-white' : 'text-stone-500 hover:bg-stone-100'}`}
+          >
+            History
+          </button>
+        </div>
       </div>
 
-      <OrdersQueueTable activeOrders={activeOrders} updateOrderStatus={updateOrderStatus} />
-
-      {/* Confirmation Window for Item Creation */}
+      {/* Modals */}
       {showAddModal && (
         <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-[2rem] shadow-2xl max-w-md w-full p-8 border border-stone-100">
@@ -157,50 +193,19 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Interactive Modal handling manual assigned inputs */}
       {showOrderModal && (
         <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-[2rem] shadow-2xl max-w-md w-full p-8 border border-stone-100">
-            <h3 className="text-xl font-bold text-[#1a2e1a] mb-1">Assign Ticket Number</h3>
-            <p className="text-stone-500 text-xs mb-4 leading-relaxed">
-              Manually assign a workspace number identifier (e.g., table number, pager ID, or custom card index).
-            </p>
-
-            <div className="mb-4">
-              <label className="block text-[10px] uppercase tracking-wider font-bold text-stone-400 mb-1">Ticket / Card Number</label>
-              <input 
-                type="text" 
-                maxLength={6}
-                placeholder="Ex: 57" 
-                value={manualTicketNum}
-                onChange={(e) => setManualTicketNum(e.target.value.replace(/\D/g, ''))} 
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-lg font-black font-mono tracking-wide focus:outline-none focus:ring-2 focus:ring-[#1a2e1a]/20"
-              />
-              {ticketError && (
-                <p className="text-red-500 text-xs font-bold mt-2 bg-red-50 p-2 rounded-lg border border-red-100">
-                  ⚠️ {ticketError}
-                </p>
-              )}
-            </div>
-
-            <div className="bg-stone-50 p-3 rounded-xl mb-6 text-xs text-stone-600 border border-stone-100">
-              <span className="font-bold block uppercase text-[10px] text-stone-400 mb-0.5">Order Preview:</span>
-              <span className="italic line-clamp-2">{compileCartSummary() || "Empty Order Cart"}</span>
-            </div>
-
-            <div className="flex space-x-3">
-              <button 
-                onClick={() => setShowOrderModal(false)} 
-                className="flex-1 py-3 border border-stone-200 rounded-xl text-stone-500 hover:bg-stone-50 text-sm font-bold transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={submitOrder} 
-                className="flex-1 py-3 bg-[#1a2e1a] hover:bg-orange-600 text-white rounded-xl text-sm font-bold transition-all shadow-md"
-              >
-                Dispatch Ticket
-              </button>
+            <h3 className="text-xl font-bold text-[#1a2e1a] mb-1">Assign Order Number</h3>
+            <input 
+              type="text" maxLength={6} placeholder="Ex: 57" value={manualTicketNum}
+              onChange={(e) => setManualTicketNum(e.target.value.replace(/\D/g, ''))} 
+              className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-lg font-black font-mono tracking-wide focus:outline-none"
+            />
+            {ticketError && <p className="text-red-500 text-xs font-bold mt-2">⚠️ {ticketError}</p>}
+            <div className="flex space-x-3 mt-4">
+              <button onClick={() => setShowOrderModal(false)} className="flex-1 py-3 border rounded-xl text-stone-500 text-sm font-bold">Cancel</button>
+              <button onClick={submitOrder} className="flex-1 py-3 bg-[#1a2e1a] text-white rounded-xl text-sm font-bold">Dispatch Order</button>
             </div>
           </div>
         </div>

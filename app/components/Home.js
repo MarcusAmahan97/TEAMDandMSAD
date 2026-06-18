@@ -39,7 +39,6 @@ export default function Home() {
     };
   }, []);
 
-  // Modified: Split array data based on database backend keys ('PREPARING' & 'NOW SERVING')
   const preparing = orders.filter(o => o.status === 'PREPARING');
   const serving = orders.filter(o => o.status === 'NOW SERVING');
 
@@ -48,7 +47,7 @@ export default function Home() {
       <div>
         <header className="text-center mb-10 mt-4">
           <h1 className="text-4xl lg:text-5xl font-black tracking-wider text-yellow-400 uppercase">Order Pick-Up Status</h1>
-          <p className="text-gray-400 text-sm mt-2">Please look out for your ticket number below</p>
+          <p className="text-gray-400 text-sm mt-2">Please look out for your order number below</p>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
